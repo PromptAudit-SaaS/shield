@@ -1,0 +1,26 @@
+{
+  "name": "@promptaudit/shield",
+  "version": "0.1.0",
+  "description": "Zero-dependency, checksum-validated, reversible masking of PII and API keys in LLM prompts and AI agent traffic. Runs 100% locally.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "src", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "keywords": ["ai-guardrails", "pii-masking", "data-masking", "secret-protection", "llm-security", "agent-safety", "redaction", "privacy", "llm", "openai", "anthropic", "zero-dependency", "typescript"],
+  "homepage": "https://promptaudit.ch/shield",
+  "scripts": {
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bunx tsc src/index.ts --declaration --emitDeclarationOnly --outDir dist --target es2020 --moduleResolution bundler --module esnext --skipLibCheck",
+    "test": "bun test",
+    "prepublishOnly": "bun run build && bun test"
+  }
+}
