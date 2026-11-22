@@ -1,8 +1,19 @@
+<div align="center">
+
 # @promptaudit/shield
 
-**Mask personal data and API keys before they reach the LLM. Restore them in the answer. Locally.**
+[![npm version](https://img.shields.io/npm/v/@promptaudit/shield.svg?color=cb3837&style=flat-square)](https://www.npmjs.com/package/@promptaudit/shield)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![dependencies](https://img.shields.io/badge/dependencies-0-success.svg?style=flat-square)](package.json)
+[![types](https://img.shields.io/badge/types-included-informational.svg?style=flat-square)](dist/index.d.ts)
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![Dependencies: 0](https://img.shields.io/badge/dependencies-0-brightgreen) ![TypeScript](https://img.shields.io/badge/TypeScript-100%25-3178c6) ![Runs locally](https://img.shields.io/badge/network-none-lightgrey)
+**Zero-dependency, fast & reversible PII and secret masking for LLMs & AI agents.**
+
+[Live Interactive Demo](https://promptaudit.ch/shield) · [Report Issue](https://github.com/PromptAudit-SaaS/shield/issues) · [Commercial Suite](https://promptaudit.ch)
+
+</div>
+
+---
 
 ```bash
 npm install @promptaudit/shield
