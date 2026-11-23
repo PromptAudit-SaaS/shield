@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="promptaudit-shield-banner.png" alt="PromptAudit Shield" width="100%" />
 
 # @promptaudit/shield
 
