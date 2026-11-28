@@ -1,6 +1,6 @@
 {
   "name": "@promptaudit/shield",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency, checksum-validated, reversible masking of PII and API keys in LLM prompts and AI agent traffic. Runs 100% locally.",
   "license": "MIT",
   "type": "module",
@@ -14,13 +14,23 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "src", "README.md", "LICENSE"],
+  "files": ["dist", "README.md", "LICENSE", "assets/banner.png"],
   "sideEffects": false,
   "keywords": ["ai-guardrails", "pii-masking", "data-masking", "secret-protection", "llm-security", "agent-safety", "redaction", "privacy", "llm", "openai", "anthropic", "zero-dependency", "typescript"],
   "homepage": "https://promptaudit.ch/shield",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PromptAudit-SaaS/shield.git"
+  },
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bunx tsc src/index.ts --declaration --emitDeclarationOnly --outDir dist --target es2020 --moduleResolution bundler --module esnext --skipLibCheck",
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bunx --package @typescript/native-preview tsgo -p tsconfig.build.json",
+    "typecheck": "bunx --package @typescript/native-preview tsgo -p tsconfig.json",
+    "bench": "bun scripts/bench.ts",
     "test": "bun test",
     "prepublishOnly": "bun run build && bun test"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "1.14.0",
+    "openai": "7.65.0"
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck -- run with bun test
 import { describe, expect, test } from "bun:test";
 import { shield, unshield, withShield } from "./index";
 
