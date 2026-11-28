@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security reporting
+    url: https://github.com/PromptAudit-SaaS/shield/blob/main/SECURITY.md
+    about: Follow the private reporting policy; never post live secrets.
+  - name: Setup questions and ideas
+    url: https://github.com/PromptAudit-SaaS/shield/discussions
+    about: Ask the community with sanitized fictional examples.
