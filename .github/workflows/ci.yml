@@ -1,0 +1,31 @@
+# Export this workflow to .github/workflows/ci.yml in the standalone MCP repository.
+# Preserve that repository's package.json and frozen Bun lockfile with SDK dev fixtures.
+name: Local Shield checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+      - run: bun install --frozen-lockfile
+      - run: bun test src
+      - run: bun run build
+      - run: bun audit
+      - name: Verify package allowlist
+        run: npm pack --dry-run

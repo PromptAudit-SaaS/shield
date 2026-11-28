@@ -1,42 +1,28 @@
 name: Publish to npm
-
 on:
-  workflow_dispatch:
-  push:
-    branches: [Haupt, main, master]
-
+  release:
+    types: [published]
+permissions:
+  contents: read
+  id-token: write
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          bun-version: latest
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install dependencies
-        run: bun install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Run Tests
-        run: bun test
-
-      - name: Build CJS, ESM & Types
-        run: bun run build
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to npm
-        run: npm publish --access public
+          bun-version: '1.4.4'
+      - run: bun install --frozen-lockfile
+      - run: bun test src
+      - run: bun run build
+      - run: bun audit
+      - run: npm pack --dry-run
+      - run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
