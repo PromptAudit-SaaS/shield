@@ -1,0 +1,18 @@
+name: Feature or pattern proposal
+description: Describe a bounded use case, including false-positive and evasion examples.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case and current limitation
+      description: Explain the local utility. Do not include proprietary source or real data.
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Fictional examples and limits
+      description: Include expected matches, benign non-matches and known evasion cases. For other features, describe an acceptance check and unsupported cases.
+    validations:
+      required: true
