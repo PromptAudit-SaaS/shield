@@ -1,10 +1,10 @@
 # @promptaudit/shield
 
-![PromptAudit Shield – lokale Textmaskierung](./assets/banner.png)
+![PromptAudit Shield – local text masking](./assets/banner.png)
 
-**Personendaten und bekannte Geheimnismuster lokal maskieren, Platzhalter in Antworten wiederherstellen – auch über mehrere Text-Chunks hinweg.**
+**Mask personal data and known secret patterns locally. Restore placeholders in responses, including across text chunks.**
 
-MIT · TypeScript · keine Laufzeitabhängigkeiten · keine Netzwerkaufrufe oder Telemetrie im Paket
+MIT · TypeScript · zero runtime dependencies · no network calls or telemetry in the package
 
 ```bash
 npm install @promptaudit/shield
@@ -14,164 +14,164 @@ npm install @promptaudit/shield
 import { shieldMessages } from '@promptaudit/shield';
 
 const session = shieldMessages([
-  { role: 'user', content: 'Kontakt: fictional@example.invalid' },
+  { role: 'user', content: 'Contact: fictional@example.invalid' },
 ]);
-console.log(session.messages); // content: 'Kontakt: [EMAIL_1]'
-console.log(session.restore('Antwort für [EMAIL_1]')); // lokales Original
+console.log(session.messages); // content: 'Contact: [EMAIL_1]'
+console.log(session.restore('Reply for [EMAIL_1]')); // local original
 session.clear();
 ```
 
-Die Daten sind fiktiv. Eine leere Trefferliste ist kein Nachweis, dass ein Text keine Geheimnisse enthält.
+The data is fictional. An empty match list does not prove that text contains no secrets.
 
-## Datenfluss und Vertrauensgrenze
+## Data flow and trust boundary
 
 ```text
-Ihr Prozess / Browser
-  Originaltext -> shield / shieldMessages -> maskierter Text
+Your process / browser
+  Original text -> shield / shieldMessages -> masked text
                        |
-                  Zuordnung im RAM
+                  Mapping in RAM
                        |
-  lokale Wiederherstellung <- Modellantwort mit Platzhaltern
+  Local restoration <- model response containing placeholders
 ```
 
-Das Paket sendet selbst nichts. **Ihr Code entscheidet**, welche Inhalte an ein Modell gehen und wer die wiederhergestellten Originale erhält. `restore`, `unshield` und die Streaming-Helfer geben Klartext an den jeweiligen Aufrufer zurück. Ein kompromittierter Prozess oder ein falscher Aufruf kann Originale offenlegen.
+The package sends nothing itself. **Your code decides** what reaches a model and who receives restored originals. `restore`, `unshield` and streaming helpers return plaintext to their caller. A compromised process or incorrect call can expose originals.
 
-## Text und Chat-Nachrichten
+## Text and chat messages
 
-| Funktion | Ergebnis |
+| Function | Result |
 | --- | --- |
-| `shield(text, detectorsOrOptions?)` | `{ masked, map, counts }`, bestehende Einzeltext-API |
-| `unshield(text, map)` | lokale Wiederherstellung bekannter Platzhalter |
-| `withShield(prompt, call)` | maskieren → kundeneigener Aufruf → lokal wiederherstellen |
-| `shieldMessages(messages, detectorsOrOptions?)` | neue Nachrichten, gemeinsame Kategorienzählung, `restore`, `createRestoreStream`, `clear` |
-| `createUnshieldStream(map, options?)` | Web-Streams-Paar für Text-Chunks |
-| `createUnshieldSseStream(map, options)` | begrenztes Web-Streams-Paar für ausdrücklich gewählte OpenAI-/Anthropic-SSE-Formate |
+| `shield(text, detectorsOrOptions?)` | `{ masked, map, counts }`, existing single-text API |
+| `unshield(text, map)` | Local restoration of known placeholders |
+| `withShield(prompt, call)` | Mask → caller's own request → restore locally |
+| `shieldMessages(messages, detectorsOrOptions?)` | New messages, shared category counts, `restore`, `createRestoreStream`, `clear` |
+| `createUnshieldStream(map, options?)` | Web Streams pair for text chunks |
+| `createUnshieldSseStream(map, options)` | Bounded Web Streams pair for explicitly selected OpenAI/Anthropic SSE formats |
 
-`shieldMessages` kopiert Nachrichten und Textblöcke, verändert die Eingabe nicht und verwendet eine getrennte Zuordnung pro Aufruf. Dieselbe erkannte Zeichenfolge erhält innerhalb dieses Aufrufs denselben Platzhalter; bereits im Eingang vorhandene Platzhalter werden nicht neu belegt. `counts` zählt eindeutige erkannte Werte, nicht jede Wiederholung.
+`shieldMessages` copies messages and text blocks without mutating input and uses a separate mapping per call. The same detected string gets the same placeholder within that call; existing input placeholders are reserved. `counts` counts unique detected values, not every occurrence.
 
-Unterstützt werden `content: string`, `content: null` und reine `{ type: 'text', text: string }`-Blöcke. **Bilder, Dateien, Tool-Aufrufe und Tool-Ergebnisse werden verweigert**, nicht still als geschützt weitergereicht. Metadaten wie `name` werden unverändert übernommen und sind nicht maskiert. Anthropic-Systemtexte ausserhalb von `messages` und Gemini-`contents` sind nicht von dieser Funktion abgedeckt. Vercel-UI-Nachrichten mit `parts` statt `content` müssen ausdrücklich konvertiert werden.
+Supported: `content: string`, `content: null` and plain `{ type: 'text', text: string }` blocks. **Images, files, tool calls and tool results are rejected**, not silently forwarded as protected. Metadata such as `name` is copied unchanged and is not masked. Anthropic system text outside `messages` and Gemini `contents` are not covered by this function. Vercel UI messages using `parts` instead of `content` require explicit conversion.
 
-## Eigene Begriffe und strukturierte Werte
+## Custom terms and structured values
 
 ```ts
 import { shieldMessages, shieldToolCalls } from '@promptaudit/shield';
-const session = shieldMessages([{ role: 'user', content: 'Projekt Alpha' }], {
-  customTerms: ['Projekt Alpha'],
+const session = shieldMessages([{ role: 'user', content: 'Project Alpha' }], {
+  customTerms: ['Project Alpha'],
 }); // content: [TERM_1]
 session.clear();
-const tools = shieldToolCalls([{ type: 'function', id: 'fiktiv', function: {
-  name: 'lookup', arguments: '{"client":"Projekt Alpha","limit":10}',
-} }], { customTerms: ['Projekt Alpha'] });
-// tools.data enthält maskierte String-Werte; IDs, Namen und Zahlen bleiben erhalten.
+const tools = shieldToolCalls([{ type: 'function', id: 'fictional', function: {
+  name: 'lookup', arguments: '{"client":"Project Alpha","limit":10}',
+} }], { customTerms: ['Project Alpha'] });
+// tools.data contains masked string values; IDs, names and numbers are preserved.
 tools.clear();
 ```
 
-`shieldStructured(value, options)` liefert `{ data, counts, restore, clear }` für ausdrücklich übergebene reine JSON-Daten. Objekt- und Array-Eingaben werden kopiert; keine Typ-/Referenzidentität für Klassen versprochen. Keys bleiben **unmaskiert** und können selbst sensible Angaben enthalten. Keine ungeprüfte Übertragung solcher Keys.
+`shieldStructured(value, options)` returns `{ data, counts, restore, clear }` for explicitly supplied plain JSON data. Objects and arrays are copied; class type/reference identity is not promised. Keys remain **unmasked** and may themselves contain sensitive information. Do not forward such keys without reviewing them.
 
-`shieldToolCalls` unterstützt OpenAI-`type: function` mit serialisierten `arguments` und Anthropic-`type: tool_use` mit `input`. Änderungen an gültigem serialisiertem JSON erfolgen nur an String-Wert-Spannen: Whitespace, Schlüssel, doppelte Schlüssel und Zahlenschreibweisen bleiben unverändert. **Ungültiges JSON, Zyklen, Getter, Klassen und überschrittene Grenzen werden verweigert**, niemals ungeprüft weitergegeben. Maskierte String-Werte können trotzdem Enum-/Formatvorgaben eines Tools verletzen; vor Ausführung separat schema-validieren und eine bewusste lokale Wiederherstellungsgrenze setzen. Ausgehende Modell-Toolbefehle werden vom Anbieter-Wrapper nicht automatisch demaskiert oder ausgeführt.
+`shieldToolCalls` supports OpenAI `type: function` with serialized `arguments` and Anthropic `type: tool_use` with `input`. Valid serialized JSON is changed only within string-value spans: whitespace, keys, duplicate keys and number lexemes are preserved. **Invalid JSON, cycles, getters, classes and exceeded limits are rejected**, never forwarded unchecked. Masked string values may still violate a tool's enum/format constraints; validate against its schema separately before execution and establish an explicit local restoration boundary. Provider wrappers do not automatically restore or execute model-generated tool commands.
 
-Begriffe: Aho–Corasick, frühester/längster nicht überlappender Treffer, Unicode-Ränder inklusive kombinierender Zeichen. Gross-/Kleinschreibung verwendet einfache Faltung pro Codepoint, **keine vollständige sprachabhängige Normalisierung** (z. B. ß/ss oder kontextuelles Sigma). `caseInsensitive: false` und `wholeWords: false` sind ausdrücklich wählbar. Normalisierung der Engine gilt weiterhin.
+Terms: Aho–Corasick; earliest/longest non-overlapping match; Unicode boundaries including combining marks. Case-insensitive matching uses simple per-code-point folding, **not full language-specific normalization** (for example ß/ss or contextual sigma). `caseInsensitive: false` and `wholeWords: false` are explicit options. Engine normalization still applies.
 
-Grenzen: 1'000 Begriffe, 256 UTF-16-Einheiten pro Begriff, 1'048'576 Einheiten pro Text/Sitzungsreservierung, 100'000 Kandidaten, 10'000 Platzhalter; strukturierte Daten standardmässig Tiefe 64 und 50'000 Knoten. Aufwand hängt auch von Wörterbuch und Trefferzahl ab; kein O(1)-Speicher-/Null-Latenz-Versprechen. Beliebige kundeneigene Regex-Detektoren sind nicht durch den Begriffsmatcher gegen ReDoS abgesichert.
+Limits: 1,000 terms; 256 UTF-16 code units per term; 1,048,576 units per text/session reservation; 100,000 candidates; 10,000 placeholders; structured data defaults to depth 64 and 50,000 nodes. Work also depends on dictionary size and match count; no O(1)-memory or zero-latency promise. Arbitrary caller-supplied regex detectors are not protected against ReDoS by the term matcher.
 
-## Anbieter-Wrapper: ausdrücklich begrenzte Schnittstelle
+## Provider wrappers: an explicitly bounded interface
 
 ```ts
 import { wrapOpenAI } from '@promptaudit/shield';
-// originalClient: Ihr separat installierter SDK-Client mit Ihrem eigenen Schlüssel.
-const client = wrapOpenAI(originalClient, { customTerms: ['Projekt Alpha'] });
+// originalClient: your separately installed SDK client with your own key.
+const client = wrapOpenAI(originalClient, { customTerms: ['Project Alpha'] });
 const stream = await client.chat.completions.create({
-  model: configuredModel, messages: [{ role: 'user', content: 'Projekt Alpha' }], stream: true,
+  model: configuredModel, messages: [{ role: 'user', content: 'Project Alpha' }], stream: true,
 });
 try {
   for await (const chunk of stream) {
     const localText = chunk.choices[0]?.delta.content ?? '';
-    // localText kann Originale enthalten: nur an berechtigte Empfänger weitergeben.
+    // localText may contain originals: share only with authorised recipients.
   }
 } finally { stream.abort(); }
 ```
 
-`wrapAnthropic(originalClient).messages.create(...)` liefert eine normale Promise; `await client.messages.stream(...)` einen eigenen einmalig konsumierbaren AsyncIterable mit `abort()`. System-Text und unterstützte Text-/Tool-Payloads werden vor dem delegierten SDK-Aufruf maskiert. Textantworten werden lokal wiederhergestellt. Request-Optionen und AbortSignal werden an das kundeneigene SDK weitergereicht; dieses SDK, nicht Shield selbst, baut die Verbindung auf.
+`wrapAnthropic(originalClient).messages.create(...)` returns a normal Promise; `await client.messages.stream(...)` returns a custom, single-consumption AsyncIterable with `abort()`. System text and supported text/tool payloads are masked before the delegated SDK call. Text responses are restored locally. Request options and AbortSignal are forwarded to the caller's SDK; that SDK, not Shield itself, opens the connection.
 
-**Kein vollständiger SDK-Drop-in:** Keine OpenAI-Responses-/Realtime-/Batch-API, `.withResponse()`, `.asResponse()`, `.tee()` oder Anthropic-Eventlistener/`.finalMessage()`/`.finalText()`. Anthropic `.stream()` ist hier asynchron und kein nativer SDK-MessageStream. Bilder und unbekannte Inhaltsblöcke werden abgewiesen. OpenAI-Tool-Ergebnisse in `role: tool` werden in dieser Fassade nur als gültiges serialisiertes JSON akzeptiert; Anthropic-`tool_result` nur als String. Weitere Formate brauchen einen eigenen geprüften Adapter. Toolschemata, IDs, Namen und übrige Metadaten bleiben unmaskiert; nur ausdrücklich unterstützte Text- und Argumentfelder werden geschützt. Der Originalclient bleibt separat zugänglich, seine Aufrufe umgehen diesen Wrapper.
+**Not a complete SDK drop-in:** No OpenAI Responses/Realtime/Batch API, `.withResponse()`, `.asResponse()`, `.tee()` or Anthropic event listeners/`.finalMessage()`/`.finalText()`. Here Anthropic `.stream()` is asynchronous, not a native SDK MessageStream. Images and unknown content blocks are rejected. OpenAI `role: tool` results are accepted only as valid serialized JSON in this facade; Anthropic `tool_result` only as a string. Other formats need their own reviewed adapter. Tool schemas, IDs, names and other metadata remain unmasked; only explicitly supported text and argument fields are protected. The original client remains accessible separately; its calls bypass the wrapper.
 
-Zuordnungen und Textkanäle sind je Anfrage getrennt. Ende, Fehler und vorzeitiger Schleifenabbruch räumen auf und brechen die eigene Anbieteranfrage ab. Unkonsumierte Streams verfallen nach standardmässig fünf Minuten (`timeoutMs`, maximal 30 Minuten); für schnellere Freigabe ausdrücklich `stream.abort()`. Aufbewahrung im RAM ist keine sichere Speicherlöschung. Pufferreste erscheinen vor Kanal-Ende, fehlerhaft abgebrochene Streams werden nicht als vollständig dargestellt. Nach Streamende ist Wiederherstellung über dieselbe Sitzung nicht mehr möglich.
+Mappings and text channels are isolated per request. Completion, errors and early loop termination clean up and abort that provider request. Unconsumed streams expire after five minutes by default (`timeoutMs`, maximum 30 minutes); call `stream.abort()` explicitly for earlier release. RAM retention is not secure memory erasure. Buffered text is emitted before channel completion; failed streams are not represented as complete. Restoration using the same session is no longer possible after stream completion.
 
-Kompatibilitätstests verwenden die tatsächlich installierten SDKs **OpenAI 7.65.0 und Anthropic 1.14.0** mit lokalen Fetch-Antworten. Das prüft deren Serialisierung/Streaming, **keinen echten Modellaufruf, Modellverhalten oder alle SDK-Versionen**. Die SDKs sind ausschliesslich Entwicklungsabhängigkeiten und werden nicht ins Laufzeitpaket gebündelt.
+Compatibility tests use the actually installed SDKs **OpenAI 7.65.0 and Anthropic 1.14.0** with local fetch responses. This checks their serialization/streaming, **not real model calls, model behaviour or every SDK version**. The SDKs are development dependencies only and are not bundled into the runtime package.
 
-## Beispiel: OpenAI-Chat (kundeneigenes SDK)
+## Example: OpenAI chat with your own SDK
 
 ```ts
 import { shieldMessages } from '@promptaudit/shield';
-// client ist Ihr separat installierter und konfigurierter OpenAI-Client.
-const session = shieldMessages([{ role: 'user' as const, content: 'Mail fictional@example.invalid' }]);
+// client is your separately installed and configured OpenAI client.
+const session = shieldMessages([{ role: 'user' as const, content: 'Email fictional@example.invalid' }]);
 try {
   const response = await client.chat.completions.create({
     model: configuredModel, messages: session.messages,
   });
   const localAnswer = session.restore(response.choices[0]?.message.content ?? '');
-  // localAnswer enthält wieder Originale. Nicht ungeprüft an andere Empfänger senden.
+  // localAnswer contains originals again. Review recipients before sharing.
 } finally {
   session.clear();
 }
 ```
 
-Dies ist ein Integrationsmuster, kein ausgeführter externer Modellaufruf. SDK und Modell werden vom Entwickler ausgewählt. Weitere Anbieter dürfen nur nach Prüfung ihrer konkreten Nachrichtentypen angeschlossen werden.
+This is an integration pattern, not an executed external model call. The developer selects the SDK and model. Other providers require review of their specific message types before integration.
 
-## Text-Streaming
+## Text streaming
 
-Ein Platzhalter kann in mehreren Chunks eintreffen: `[` → `IB` → `AN_1]`. Die Wiederherstellung prüft **exakte Schlüssel der lokalen Zuordnung**, nicht nur Kategoriennamen. Unbekannte Tokens, Markdown-Klammern und unvollständige Tokens bleiben unverändert. Backpressure wird über native Web Streams weitergegeben.
+A placeholder may arrive across chunks: `[` → `IB` → `AN_1]`. Restoration checks **exact keys in the local mapping**, not just category names. Unknown tokens, Markdown brackets and incomplete tokens remain unchanged. Backpressure is passed through native Web Streams.
 
 ```ts
 import { createUnshieldStream, shield } from '@promptaudit/shield';
-const session = shield('Mail fictional@example.invalid');
-// textStream: ReadableStream<string> mit Modell-Text, nicht rohem SSE/JSON.
+const session = shield('Email fictional@example.invalid');
+// textStream: ReadableStream<string> of model text, not raw SSE/JSON.
 const restored = textStream.pipeThrough(createUnshieldStream(session.map));
 ```
 
-Für Vercel AI SDK ist dieses Muster auf einen tatsächlichen `ReadableStream<string>` wie `result.textStream` beschränkt. Es ist **kein** allgemeiner Ersatz für dessen UI-/Tool-Stream-Protokoll.
+For Vercel AI SDK, this pattern is limited to a real `ReadableStream<string>` such as `result.textStream`. It is **not** a general replacement for that SDK's UI/tool stream protocol.
 
-Die Helfer liefern ein `ReadableWritablePair`, das eine native `TransformStream`-Instanz mit Abbruchbereinigung umschliesst. Kein zusätzlicher Parser wird benötigt. `Transformer.cancel` wird nicht als portable Funktion vorausgesetzt.
+The helpers return a `ReadableWritablePair` wrapping a native `TransformStream` instance with abort cleanup. No additional parser is required. `Transformer.cancel` is not assumed to be portable.
 
-### Ressourcen und Abbruch
+### Resources and cancellation
 
-- Standard `maxBufferSize: 256` **UTF-16-Codeeinheiten**, nicht Bytes. Bereich 8–4'096; sämtliche Map-Schlüssel müssen hineinpassen, sonst Fehler vor dem Start.
-- Der ausstehende Tokenpuffer ist begrenzt. Die Präfixmenge wächst mit Anzahl und Länge der bekannten Schlüssel; die gesamte Sitzung ist **nicht O(1)**.
-- Leser-Cancel, Schreiber-Abort, Fehler und normales Ende räumen den internen Parser auf. Optionaler `signal`-Abbruch beendet die Verarbeitung.
-- `clearVaultOnTerminate: true` löscht die Map nur bei exklusiver Eigentümerschaft. Bei `shieldMessages` verwenden Sie `session.clear()` nach Abschluss aller Streams; ein einzelner Stream darf die gemeinsame Session nicht leeren.
-- Map-Clear ist **keine sichere RAM-Nullung**; JavaScript kann vorhandene Strings und externe Kopien nicht garantiert löschen. Zuordnungen niemals global zwischen Nutzern teilen oder protokollieren.
+- Default `maxBufferSize: 256` **UTF-16 code units**, not bytes. Range 8–4,096; all mapping keys must fit, otherwise an error is raised before starting.
+- The pending token buffer is bounded. The prefix set grows with the number and length of known keys; the whole session is **not O(1)**.
+- Reader cancellation, writer abort, errors and normal completion clear the internal parser. An optional `signal` abort stops processing.
+- `clearVaultOnTerminate: true` clears the map only under exclusive ownership. With `shieldMessages`, call `session.clear()` after all streams finish; one stream must not clear a shared session.
+- Clearing a map is **not secure RAM zeroing**; JavaScript cannot guarantee erasure of existing strings and external copies. Never share mappings globally across users or log them.
 
-## Rohes SSE
+## Raw SSE
 
 ```ts
 import { shield, createUnshieldSseStream } from '@promptaudit/shield';
-const session = shield('Mail fictional@example.invalid');
-// body: ReadableStream<Uint8Array> eines kundeneigenen Anbieteraufrufs.
+const session = shield('Email fictional@example.invalid');
+// body: ReadableStream<Uint8Array> from your own provider request.
 const restoredBody = body.pipeThrough(createUnshieldSseStream(session.map, {
-  provider: 'openai', // oder 'anthropic'; ausdrücklich wählen
+  provider: 'openai', // or 'anthropic'; select explicitly
   clearVaultOnTerminate: true,
 }));
 ```
 
-Gemessen werden in lokalen Fixtures OpenAI-Chat-Completions (`choices[index].delta.content`) und Anthropic-Text-Deltas (`content_block_delta`, `index`, `delta.type: text_delta`). Keine Behauptung über alle SDK-Versionen oder Gemini-/OpenAI-Responses-/Vercel-UI-Protokolle.
+Local fixtures cover OpenAI Chat Completions (`choices[index].delta.content`) and Anthropic text deltas (`content_block_delta`, `index`, `delta.type: text_delta`). No claim of compatibility with all SDK versions or Gemini/OpenAI Responses/Vercel UI protocols.
 
-Der Parser erhält SSE-Kommentare, `event`, `id`, `retry`, mehrzeilige `data`-Felder und Nicht-Text-Ereignisse; Zeilenenden werden zu LF normalisiert. Ausgabekanäle haben getrennte Tokenpuffer. Unvollständiger Text wird vor einem Endereignis ausgegeben; dazu kann ein zusätzlicher Text-Delta mit der letzten bekannten Hülle entstehen. Nicht für signierte oder byteidentisch zu erhaltende Ereignisse verwenden.
+The parser preserves SSE comments, `event`, `id`, `retry`, multiline `data` fields and non-text events; line endings are normalized to LF. Output channels have separate token buffers. Incomplete text is emitted before an end event; this may create an extra text delta using the last known envelope. Do not use it for signed events or events that must remain byte-identical.
 
-Standardgrenzen: **65'536 UTF-16-Codeeinheiten pro Event, 32 aktive Textkanäle**; maximal einstellbar 1'048'576 bzw. 128. Ungültiges UTF-8, fehlerhaftes JSON und überschrittene Grenzen erzeugen einen Fehler statt stillen Textverlust. Metadaten und Nicht-Text-Payloads werden nicht maskiert. Kein Fetch-Interceptor, keine automatische Eingabeabfangfunktion.
+Default limits: **65,536 UTF-16 code units per event, 32 active text channels**; configurable up to 1,048,576 and 128 respectively. Invalid UTF-8, malformed JSON and exceeded limits produce an error rather than silent text loss. Metadata and non-text payloads are not masked. No fetch interception or automatic prompt interception.
 
-## Erkennung und Grenzen
+## Detection and limits
 
-IBAN (Mod-97), Karten (Luhn + unterstützte Präfixe), US-SSN-Strukturregeln, ABA-Routing-Prüfsumme mit Schlüsselwort, E-Mail, internationale Telefonnummern, Namen nach unterstützten englischen Titeln, bekannte API-Schlüsselmuster/JWT, PEM-Privatschlüssel, Datenbank-URLs mit Zugangsdaten, `.env`-Geheimnismuster und Bearer-Werte.
+IBAN (Mod-97); cards (Luhn plus supported prefixes); US SSN structural rules; ABA routing checksum with a keyword; email; international phone numbers; names following supported English titles; known API-key patterns/JWT; PEM private keys; credential-bearing database URLs; `.env` secret patterns; Bearer values.
 
-- US-SSN-Regeln sind Strukturprüfungen, **keine Prüfsumme oder Identitätsprüfung**.
-- Keine Entropieprüfung eingebaut. `.env`-Treffer sind Mustererkennung, keine Garantie für echte Zugangsdaten.
-- Freitextadressen, Namen ohne unterstützten Titel, medizinische Begriffe und unbekannte Geheimnisformate können unerkannt bleiben. Falschtreffer sind möglich, auch bei gültigen Prüfsummen.
-- Normalisierung entfernt Zero-Width-Zeichen und faltet Full-Width-Zeichen; Wiederherstellung liefert normalisierte erkannte Werte, **keine byteidentische Originalrekonstruktion**.
-- Keine NER-Modelle, unabhängige Zertifizierung, DLP-Garantie, verschlüsselte Ablage oder Auditprotokolle. NLP-Lösungen lösen andere Erkennungsaufgaben; hier wurde kein Presidio-Geschwindigkeits-/Grössenvergleich gemessen.
+- US SSN rules are structural checks, **not a checksum or identity verification**.
+- No built-in entropy check. `.env` matches are pattern recognition, not proof of real credentials.
+- Free-form addresses, names without a supported title, medical terms and unknown secret formats may remain undetected. False positives are possible, even with valid checksums.
+- Normalization removes zero-width characters and folds full-width characters; restoration returns normalized matched values, **not byte-identical originals**.
+- No NER models, independent certification, DLP guarantee, encrypted storage or audit logs. NLP systems address different detection tasks; no Presidio speed/size comparison has been measured here.
 
-## Reproduzierbare lokale Prüfungen
+## Reproducible local checks
 
-Im Quellrepository mit Bun:
+From the source repository with Bun:
 
 ```bash
 bun test src
@@ -180,14 +180,14 @@ bun run build
 bun run bench
 ```
 
-Der Benchmark nutzt fiktive Daten und berichtet Corpuslänge, 1'000 Messungen, Median/p95 sowie unminifizierte ESM- und gzip-Grösse. Werte gelten für das ausgeführte Gerät und die Laufzeit; **keine festen <5-KB-, 0-ms- oder Sub-Millisekunden-Versprechen**.
+The benchmark uses fictional data and reports corpus length, 1,000 measurements, median/p95 and unminified ESM/gzip sizes. Results apply to the device and runtime used; **no fixed <5 KB, 0 ms or sub-millisecond promises**.
 
-Grundlagen: [Web Streams](https://streams.spec.whatwg.org/), [SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html).
+References: [Web Streams](https://streams.spec.whatwg.org/), [SSE](https://html.spec.whatwg.org/multipage/server-sent-events.html).
 
-## Mitwirken und weitere Bausteine
+## Contributing and related tools
 
-Fiktive Gegenbeispiele und reproduzierbare Regressionstests sind willkommen. Bitte keine echten Schlüssel oder Personendaten in Issues oder Pull Requests einfügen. Vor Veröffentlichung API-Verträglichkeit, Abbruchpfade und Paketinhalt prüfen.
+Fictional counterexamples and reproducible regression tests are welcome. Do not include real keys or personal data in issues or pull requests. Review API compatibility, abort paths and package contents before publishing.
 
-Der separate [MCP-Adapter](https://github.com/PromptAudit-SaaS/mcp) nutzt die lokale Engine. Seine Werkzeugnamen bleiben `mask_text`, `scan_text`, `restore_text`; er fängt keine beliebigen Client-Eingaben automatisch ab. Git-Diff-/Pre-Commit-Scan und SARIF sind hier **nicht implementiert**.
+The separate [MCP adapter](https://github.com/PromptAudit-SaaS/mcp) uses the local engine. Its tools are `mask_text`, `scan_text`, `restore_text`, `mask_json` and `restore_json`; it does not automatically intercept arbitrary client input. The adapter can scan a Git diff explicitly piped into its CLI. An automatic pre-commit hook and SARIF are **not implemented** here.
 
-[PromptAudit](https://promptaudit.ch) entwickelt daneben Datenschutz-/Tresor- und KI-Audit-Funktionen; diese proprietären Module sind nicht Bestandteil dieses MIT-Pakets.
+[PromptAudit](https://promptaudit.ch) separately develops data-protection/vault and AI-audit features; these proprietary modules are not part of this MIT package.

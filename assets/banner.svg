@@ -6,7 +6,7 @@
 <text x="72" y="84" font-family="IBM Plex Mono,monospace" font-size="15" fill="#7d93b5" letter-spacing="2">GITHUB.COM/PROMPTAUDIT-SAAS/SHIELD · NPM @PROMPTAUDIT/SHIELD</text>
 <g transform="translate(72,120)"><path d="M40 0 L80 14 V48 C80 74 62 92 40 100 C18 92 0 74 0 48 V14 Z" fill="#d52b1e"/><path d="M34 30h12v14h14v12H46v14H34V56H20V44h14z" fill="#fff"/></g>
 <text x="176" y="185" font-family="IBM Plex Sans,Arial,sans-serif" font-size="68" font-weight="700" fill="#fff">promptaudit<tspan fill="#5d7396"> / </tspan><tspan fill="#ff4d3d">shield</tspan></text>
-<text x="176" y="228" font-family="IBM Plex Sans,Arial,sans-serif" font-size="24" fill="#c4d1e6">Mask PII and API keys before they reach the LLM. Restore them in the answer. Locally.</text>
+<text x="176" y="228" font-family="IBM Plex Sans,Arial,sans-serif" font-size="24" fill="#c4d1e6">Mask personal data and known secret patterns locally. Restore placeholders in replies.</text>
 <g font-family="IBM Plex Mono,monospace" font-size="17">
 <rect x="72" y="272" width="1136" height="104" rx="8" fill="#08101d" stroke="#2a3f60"/>
 <text x="96" y="306" fill="#7d93b5">you   ›</text><text x="186" y="306" fill="#e6edf7">refund Mr. John Miller, IBAN CH93 0076 2011 6238 5295 7, key sk-proj-AbC1…</text>
@@ -14,7 +14,7 @@
 <g font-family="IBM Plex Sans,Arial,sans-serif" text-anchor="middle">
 <g transform="translate(72,404)"><rect width="268" height="110" rx="8" fill="#101c30" stroke="#2a3f60"/><text x="134" y="56" font-size="42" font-weight="700" fill="#ff4d3d">0</text><text x="134" y="88" font-size="15" fill="#9fb0cc" letter-spacing="2">DEPENDENCIES</text></g>
 <g transform="translate(361,404)"><rect width="268" height="110" rx="8" fill="#101c30" stroke="#2a3f60"/><text x="134" y="56" font-size="42" font-weight="700" fill="#ff4d3d">10</text><text x="134" y="88" font-size="15" fill="#9fb0cc" letter-spacing="2">DETECTION TYPES</text></g>
-<g transform="translate(650,404)"><rect width="268" height="110" rx="8" fill="#101c30" stroke="#2a3f60"/><text x="134" y="56" font-size="42" font-weight="700" fill="#ff4d3d">4</text><text x="134" y="88" font-size="15" fill="#9fb0cc" letter-spacing="2">CHECKSUM VALIDATORS</text></g>
+<g transform="translate(650,404)"><rect width="268" height="110" rx="8" fill="#101c30" stroke="#2a3f60"/><text x="134" y="56" font-size="42" font-weight="700" fill="#ff4d3d">3</text><text x="134" y="88" font-size="15" fill="#9fb0cc" letter-spacing="2">CHECKSUM VALIDATORS</text></g>
 <g transform="translate(939,404)"><rect width="268" height="110" rx="8" fill="#101c30" stroke="#2a3f60"/><text x="134" y="56" font-size="42" font-weight="700" fill="#f2c14e">MIT</text><text x="134" y="88" font-size="15" fill="#9fb0cc" letter-spacing="2">LICENSE</text></g></g>
-<text x="72" y="562" font-family="IBM Plex Mono,monospace" font-size="15" fill="#7d93b5">BROWSER · NODE · BUN · DENO · EDGE WORKERS &#160;&#160;|&#160;&#160; IBAN · CARD · US SSN · ABA · API KEYS · JWT · PEM · EMAIL · PHONE · NAME</text>
+<text x="72" y="562" font-family="IBM Plex Mono,monospace" font-size="15" fill="#7d93b5">BROWSER · NODE · BUN · DENO · EDGE WORKERS &#160;&#160;|&#160;&#160; IBAN · CARD · SSN RULES · ABA · API KEYS · JWT · PEM · EMAIL · PHONE · NAME</text>
 </svg>

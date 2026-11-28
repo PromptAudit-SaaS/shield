@@ -1,6 +1,6 @@
 {
   "name": "@promptaudit/shield",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Zero-dependency, checksum-validated, reversible masking of PII and API keys in LLM prompts and AI agent traffic. Runs 100% locally.",
   "license": "MIT",
   "type": "module",
