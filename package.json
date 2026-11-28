@@ -2,55 +2,18 @@
   "name": "@promptaudit/shield",
   "version": "0.1.2",
   "description": "Zero-dependency, checksum-validated, reversible masking of PII and API keys in LLM prompts and AI agent traffic. Runs 100% locally.",
-  "license": "MIT",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    "assets/banner.png"
-  ],
+  "license": "MIT", "type": "module",
+  "main": "./dist/index.cjs", "module": "./dist/index.js", "types": "./dist/index.d.ts",
+  "exports": {".": {"types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs"}},
+  "files": ["dist", "README.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.md", "SUPPORT.md", "CODE_OF_CONDUCT.md"],
   "sideEffects": false,
-  "keywords": [
-    "ai-guardrails",
-    "pii-masking",
-    "data-masking",
-    "secret-protection",
-    "llm-security",
-    "agent-safety",
-    "redaction",
-    "privacy",
-    "llm",
-    "openai",
-    "anthropic",
-    "zero-dependency",
-    "typescript"
-  ],
+  "keywords": ["ai-guardrails", "pii-masking", "data-masking", "secret-protection", "llm-security", "agent-safety", "redaction", "privacy", "llm", "openai", "anthropic", "zero-dependency", "typescript"],
   "homepage": "https://promptaudit.ch/shield",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PromptAudit-SaaS/shield.git"
-  },
+  "repository": {"type": "git", "url": "https://github.com/PromptAudit-SaaS/shield.git"},
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "bench": "bun scripts/bench.ts",
-    "test": "bun test",
-    "prepublishOnly": "bun run build && bun test"
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bunx --package @typescript/native-preview@7.0.0-dev.20260707.2 tsgo -p tsconfig.build.json",
+    "typecheck": "bunx --package @typescript/native-preview@7.0.0-dev.20260707.2 tsgo -p tsconfig.json --noEmit",
+    "bench": "bun scripts/bench.ts", "test": "bun test", "prepublishOnly": "bun run build && bun test"
   },
-  "devDependencies": {
-    "@anthropic-ai/sdk": "1.14.0",
-    "openai": "7.65.0",
-    "typescript": "^5.8.2"
-  }
+  "devDependencies": {"@anthropic-ai/sdk":"1.14.0", "@types/node":"26.6.11", "bun-types":"1.4.5", "openai":"7.65.0", "typescript":"^5.8.2"}
 }

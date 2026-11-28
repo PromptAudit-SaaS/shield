@@ -18,11 +18,16 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.4.4'
+      - name: Require release tag to match immutable package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: node -e "if (process.env.RELEASE_TAG !== 'v' + require('./package.json').version) process.exit(1)"
       - run: bun install --frozen-lockfile
+      - run: bunx -p @typescript/native-preview@7.0.0-dev.20260707.2 tsgo -p tsconfig.json --noEmit
       - run: bun test src
       - run: bun run build
       - run: bun audit
-      - run: npm pack --dry-run
+      - run: bun scripts/release-policy.ts
       - run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
