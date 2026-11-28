@@ -25,12 +25,16 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Run Tests
         run: bun test
 
       - name: Build CJS, ESM & Types
         run: bun run build
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm
         run: npm publish --access public

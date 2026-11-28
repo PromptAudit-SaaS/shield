@@ -14,23 +14,43 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md", "LICENSE", "assets/banner.png"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "assets/banner.png"
+  ],
   "sideEffects": false,
-  "keywords": ["ai-guardrails", "pii-masking", "data-masking", "secret-protection", "llm-security", "agent-safety", "redaction", "privacy", "llm", "openai", "anthropic", "zero-dependency", "typescript"],
+  "keywords": [
+    "ai-guardrails",
+    "pii-masking",
+    "data-masking",
+    "secret-protection",
+    "llm-security",
+    "agent-safety",
+    "redaction",
+    "privacy",
+    "llm",
+    "openai",
+    "anthropic",
+    "zero-dependency",
+    "typescript"
+  ],
   "homepage": "https://promptaudit.ch/shield",
   "repository": {
     "type": "git",
     "url": "https://github.com/PromptAudit-SaaS/shield.git"
   },
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bunx --package @typescript/native-preview tsgo -p tsconfig.build.json",
-    "typecheck": "bunx --package @typescript/native-preview tsgo -p tsconfig.json",
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target browser && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "bench": "bun scripts/bench.ts",
     "test": "bun test",
     "prepublishOnly": "bun run build && bun test"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "1.14.0",
-    "openai": "7.65.0"
+    "openai": "7.65.0",
+    "typescript": "^5.8.2"
   }
 }
